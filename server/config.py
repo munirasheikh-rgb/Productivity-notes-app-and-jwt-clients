@@ -1,8 +1,8 @@
 import os
 
 class Config:
- SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI","sqlite:///producivityy_notes.db")
+ SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI","sqlite:///productivity_notes.db")
  SQLALCHEMY_TRACK_MODIFICATIONS =False
- JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY","my_secret_development_key")
+ JWT_SECRET_KEY = "cd029162c63773a70e66bc41e9aa2923b586448b1f463d2768a5267d5c9c7d79"
 
  JSON_SORT_KEYS =False
