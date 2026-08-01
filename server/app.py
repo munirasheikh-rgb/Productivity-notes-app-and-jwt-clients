@@ -14,7 +14,7 @@ cors.init_app(app)
 
 from server.models import User,Note
 
-@app.route("/")
+@app.route("/",methods=["GET"])
 def index():
     return make_response({"message":"Welcome to Notes Productivity app"})
 

@@ -1,5 +1,5 @@
 from server.extension import db,bcrypt
-
+# user model for authentication 
 class User(db.Model):
     __tablename__ ="users"
 
@@ -7,7 +7,7 @@ class User(db.Model):
     username = db.Column(db.String,nullable=False,unique=True)
     password_hash = db.Column(db.String,nullable=False)
     notes = db.relationship("Note",backref="user",cascade="all,delete-orphan")
-# add secure password handling
+# secure password handling using flask-Bcrypt
     @property
     def password(self):
         raise AttributeError("Password cannot be viewed")
@@ -20,7 +20,7 @@ class User(db.Model):
     
     def __repr__(self):
      return f"<User {self.username}>"
-    
+ 
 class Note(db.Model):
     __tablename__ = "notes"
     id = db.Column(db.Integer,primary_key=True)
