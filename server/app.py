@@ -1,6 +1,6 @@
 from flask import Flask,make_response
-from extension import db,migrate,bcrypt,jwt,ma,cors
-from config import Config
+from server.extension import db,migrate,bcrypt,jwt,ma,cors
+from server.config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,6 +12,7 @@ jwt.init_app(app)
 ma.init_app(app)
 cors.init_app(app)
 
+from server.models import User,Note
 
 @app.route("/")
 def index():
