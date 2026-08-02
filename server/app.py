@@ -2,13 +2,16 @@ from flask import Flask,make_response
 from server.extension import db,migrate,bcrypt,jwt,ma,cors,api
 from server.config import Config
 
-from server.resources.auth import SignUp,Login
+from server.resources.auth import SignUp,Login,CheckSession
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 api.add_resource(SignUp,"/signup")
 api.add_resource(Login,"/login")
+api.add_resource(CheckSession,"/me")
+
+
 db.init_app(app)
 migrate.init_app(app,db)
 bcrypt.init_app(app)
