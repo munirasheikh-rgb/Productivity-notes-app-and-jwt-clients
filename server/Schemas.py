@@ -6,8 +6,7 @@ from server.extension import db
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
-        load_instance = True
-        sqla_session = db.session
+        load_instance = False
         exclude = ("password_hash",)
 # allow plain password instead of serializing the hash password
     password = fields.String(load_only=True,required=True)
@@ -15,8 +14,7 @@ class UserSchema(SQLAlchemyAutoSchema):
 class NoteSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Note
-        load_instance = True
-        sqla_session =db.session
+        load_instance = False
         include_fk= True
 
 user_schema = UserSchema()
