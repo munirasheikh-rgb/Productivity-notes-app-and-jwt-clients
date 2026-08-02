@@ -3,13 +3,14 @@ from server.extension import db,migrate,bcrypt,jwt,ma,cors,api
 from server.config import Config
 
 from server.resources.auth import SignUp,Login,CheckSession
-
+from server.resources.notes import Notes,NoteById
 app = Flask(__name__)
 app.config.from_object(Config)
 
 api.add_resource(SignUp,"/signup")
 api.add_resource(Login,"/login")
 api.add_resource(CheckSession,"/me")
+api.add_resource(Notes,"/notes")
 
 
 db.init_app(app)

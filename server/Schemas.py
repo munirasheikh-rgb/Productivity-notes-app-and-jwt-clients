@@ -12,6 +12,7 @@ class UserSchema(SQLAlchemyAutoSchema):
     password = fields.String(load_only=True,required=True)
 
 class NoteSchema(SQLAlchemyAutoSchema):
+    user_id = fields.Integer(dump_only=True)
     class Meta:
         model = Note
         load_instance = False
