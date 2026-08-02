@@ -1,13 +1,14 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required,get_jwt_identity
-
+from marshmallow import ValidationError
 from server.extension import db
 from server.models import Note
 from server.Schemas import note_schema,notes_schema
 
 class Notes(Resource):
-    @jwt_required()
+    # only authenticated users can retrieve their notes
+    @jwt_required() 
     def get(self):
         user_id = int(get_jwt_identity())
 
@@ -27,7 +28,7 @@ class Notes(Resource):
                     "has_previous":pagination.has_prev
                 }
                 }),200
-    
+    # require autthentication before ceating a note
     @jwt_required()
     def post(self):
         user_id = int(get_jwt_identity())
@@ -36,13 +37,15 @@ class Notes(Resource):
             data = note_schema.load(request.get_json() or {})
 
             note = Note(title=data["title"],content=data.get("content"),
-                category=data.get("category","general"),is_pinned=data.get("is_pinned",False),user_id=user_id)
+                category=data.get("category","general"),is_pinned=data.get("is_pinned",False),user_id=user_id)  #associate the new note with the authenticated user
 
             db.session.add(note)
             db.session.commit()
 
             return({"message":"Note Created sucessfully",
                     "note":note_schema.dump(note)}),201
+        except ValidationError as error:
+            return({"error":error.messages}),400
         
         except Exception as error:
             db.session.rollback()
@@ -50,7 +53,7 @@ class Notes(Resource):
             return({"error":"Unable to create a note"}),500
         
 class NoteById(Resource):
-    @jwt_required()
+    @jwt_required() #a user can only update their own notes
     def patch(self,id):
        user_id = int(get_jwt_identity())
        
@@ -64,19 +67,39 @@ class NoteById(Resource):
            r_fields = ["title","content","category","is_pinned"]
            for field in r_fields:
                if field in data:
-                   setattr(note,field ,data["field"] )
+                   setattr(note,field ,data[field] )
 
            db.session.commit()
            return({"message":"Note updated successfully",
                            "note":note_schema.dump(note)}),200
+       
+       except ValidationError as error:
+                   return({"error":error.messages}),400
+               
        except Exception as e :
            db.session.rollback()
            print(e)
-           return({"error":"Unable to update this note"}),400
-
- 
-                 
-
+           return({"error":"Unable to update this note"}),500
+       
+    @jwt_required() #user's can only delete their own notes
+    def delete(self,id):
+        user_id = int(get_jwt_identity())
+        note = Note.query.filter_by(id=id,user_id=user_id).first()  
+        if not note:
+            return ({"error":"Note not found"}),404
+        try:
+           db.session.delete(note)
+           db.session.commit()
+           return({"message":"Note deleted successfully"}),200
+        
+        except ValidationError as error:
+                    return({"error":error.messages}),400
+                
+        except Exception as error:
+            db.session.rollback()
+            print(error)
+            return({"error":"Unable to delete this note"}),500
+        
        
       
     

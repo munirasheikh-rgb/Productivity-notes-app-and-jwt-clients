@@ -11,7 +11,7 @@ api.add_resource(SignUp,"/signup")
 api.add_resource(Login,"/login")
 api.add_resource(CheckSession,"/me")
 api.add_resource(Notes,"/notes")
-
+api.add_resource(NoteById,"/notes/<int:id>")
 
 db.init_app(app)
 migrate.init_app(app,db)
