@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from server.extension import db
 from server.models import User
 from server.Schemas import user_schema
+from flask_jwt_extended import (create_access_token,get_jwt_identity,jwt_required)
 
 class SignUp(Resource):
     def post(self):
@@ -25,4 +26,28 @@ class SignUp(Resource):
             db.session.rollback()
             print(error)
             return ({"error":str(error)}),500
+
+class Login(Resource):
+    def post(self):
+        data = request.get_json() or {}
+        username = data.get("username")
+        password = data.get("password")
+
+        if not username or not password:
+            return ({"error":"Provide username or password"}),400
+
+        user = User.query.filter_by(username=username).first()
+
+        if not user or not user.check_password(password):
+            return({"error":"Invalid email or password"}),401
+
+        access_token = create_access_token(identity=str(user.id))
+
+        return({"message":"Login successfull!",
+                "access_token":access_token,
+                "user":user_schema.dump(user)
+                }),200
+
+        
+
 
