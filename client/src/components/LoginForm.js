@@ -9,6 +9,7 @@ function LoginForm({ onLogin }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setErrors([])
     setIsLoading(true);
     fetch("/login", {
       method: "POST",
@@ -16,15 +17,18 @@ function LoginForm({ onLogin }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ username, password }),
-    }).then((r) => {
-      setIsLoading(false);
-      if (r.ok) {
-        r.json().then(({token, user}) => onLogin(token, user));
-      } else {
-        r.json().then((err) => setErrors(err.errors));
+    }).then(async (r) => {
+      const data=await r.json()
+      if (!r.ok){
+        throw new Error(data.error || "Login failed")
       }
-    });
-  }
+      return data
+      }).then((data)=>{
+        onLogin(data.access_token,data.user)
+      }).catch((error)=>{setErrors([error.message])})
+      .finally(()=>{setIsLoading(false)})
+    }
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -54,8 +58,8 @@ function LoginForm({ onLogin }) {
         </Button>
       </FormField>
       <FormField>
-        {errors.map((err) => (
-          <Error key={err}>{err}</Error>
+        {errors.map((err,index) => (
+          <Error key={`${err}-${index}`}>{err}</Error>
         ))}
       </FormField>
     </form>
